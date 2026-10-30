@@ -1,0 +1,18 @@
+{
+  "name": {"text": "Example Case", "color": "gold"},
+  "entries": [
+    {"item": {"id": "minecraft:cooked_beef", "count": 8},  "rarity": "mil_spec"},
+    {"item": {"id": "minecraft:iron_ingot", "count": 6},   "rarity": "mil_spec"},
+    {"item": {"id": "minecraft:gold_ingot", "count": 4},   "rarity": "mil_spec"},
+    {"item": {"id": "minecraft:experience_bottle", "count": 8}, "rarity": "mil_spec"},
+    {"item": {"id": "minecraft:diamond", "count": 2},      "rarity": "restricted"},
+    {"item": {"id": "minecraft:golden_apple", "count": 2}, "rarity": "restricted"},
+    {"item": {"id": "minecraft:emerald", "count": 12},     "rarity": "restricted"},
+    {"item": {"id": "minecraft:diamond", "count": 8},      "rarity": "classified"},
+    {"item": {"id": "minecraft:ender_pearl", "count": 8},  "rarity": "classified"},
+    {"item": {"id": "minecraft:netherite_ingot"},          "rarity": "covert"},
+    {"item": {"id": "minecraft:enchanted_golden_apple"},   "rarity": "covert"},
+    {"item": {"id": "minecraft:nether_star"},              "rarity": "exceedingly_rare", "weight": 0.1},
+    {"item": {"id": "minecraft:elytra"},                   "rarity": "exceedingly_rare"}
+  ]
+}
