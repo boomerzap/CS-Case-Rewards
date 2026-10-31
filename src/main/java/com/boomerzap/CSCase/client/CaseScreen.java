@@ -47,6 +47,10 @@ public class CaseScreen extends Screen {
     // Spin strip
     private static final int STRIP_W = 64, STRIP_H = 72, STRIP_PITCH = 68;
     private static final int STRIP_CARDS = 64;
+    // Visual-only tuning: these never affect what the server actually rolls.
+    private static final float COVERT_STRIP_BOOST = 3.0f;      // filler odds multiplier
+    private static final float GOLD_STRIP_BOOST = 6.0f;
+    private static final float NEAR_MISS_CHANCE = 0.4f;        // chance a rare card sits right next to the winner
     private static final int HEADER_H = 30, FOOTER_H = 34;
 
     private final ResourceLocation caseId;
@@ -177,13 +181,26 @@ public class CaseScreen extends Screen {
                 stripStacks.add(won.copy());
                 stripRarities.add(rarity);
             } else {
-                CaseEntry e = def.roll(random);
+                CaseEntry e = def.entries().get(rollStripIndex(random, false));
                 stripStacks.add(e.stack().copy());
                 stripRarities.add(e.rarity());
             }
         }
+
         // Land somewhere inside the winning card, not always dead centre.
-        targetScroll = winnerIndex * STRIP_PITCH + (random.nextFloat() - 0.5f) * STRIP_W * 0.7f;
+        float offset = (random.nextFloat() - 0.5f) * STRIP_W * 0.7f;
+
+        // Near miss: if the winner is not rare, sometimes park a covert/gold card right beside it
+        // and stop close to that edge, so it looks like the roulette almost landed on it.
+        if (def != null && rarity.compareTo(CaseRarity.COVERT) < 0 && random.nextFloat() < NEAR_MISS_CHANCE
+                && hasRareEntries()) {
+            int side = random.nextBoolean() ? 1 : -1;
+            CaseEntry tease = def.entries().get(rollStripIndex(random, true));
+            stripStacks.set(winnerIndex + side, tease.stack().copy());
+            stripRarities.set(winnerIndex + side, tease.rarity());
+            offset = side * STRIP_W * (0.36f + random.nextFloat() * 0.10f); // stays inside the winning card
+        }
+        targetScroll = winnerIndex * STRIP_PITCH + offset;
         wonStack = won.copy();
         wonRarity = rarity;
         spinDuration = Math.max(20, ticks - 10); // finish a touch before the item is handed over
@@ -193,6 +210,41 @@ public class CaseScreen extends Screen {
         waiting = false;
         state = State.SPINNING;
         updateButtons();
+    }
+
+    private boolean hasRareEntries() {
+        if (def == null) return false;
+        for (CaseEntry e : def.entries()) {
+            if (e.rarity().compareTo(CaseRarity.COVERT) >= 0) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Picks an entry index for strip filler using the real weights, with covert and gold boosted
+     * so rare cards flash past more often than they actually drop. {@code rareOnly} restricts the pick
+     * to covert and above (used for near-miss teasers).
+     */
+    private int rollStripIndex(RandomSource random, boolean rareOnly) {
+        List<CaseEntry> entries = def.entries();
+        double[] w = new double[entries.size()];
+        double total = 0;
+        for (int n = 0; n < w.length; n++) {
+            CaseRarity r = entries.get(n).rarity();
+            double weight = def.weightOf(n);
+            if (r == CaseRarity.EXCEEDINGLY_RARE) weight *= GOLD_STRIP_BOOST;
+            else if (r == CaseRarity.COVERT) weight *= COVERT_STRIP_BOOST;
+            if (rareOnly && r.compareTo(CaseRarity.COVERT) < 0) weight = 0;
+            w[n] = weight;
+            total += weight;
+        }
+        if (total <= 0) return random.nextInt(entries.size());
+        double roll = random.nextDouble() * total;
+        for (int n = 0; n < w.length; n++) {
+            roll -= w[n];
+            if (roll < 0 && w[n] > 0) return n;
+        }
+        return w.length - 1;
     }
 
     private void finishSpin() {
