@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.network.chat.Component;
@@ -22,14 +23,17 @@ import net.minecraft.util.RandomSource;
  * they do not need to sum to 100.
  */
 public final class CaseDefinition {
-    public static final Codec<CaseDefinition> CODEC = RecordCodecBuilder.create(i -> i.group(
+    private static final Codec<CaseDefinition> BASE_CODEC = RecordCodecBuilder.create(i -> i.group(
             ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(CaseDefinition::name),
             Codec.unboundedMap(CaseRarity.CODEC, Codec.doubleRange(0.0, 1.0E9))
                     .optionalFieldOf("rarity_weights", Map.of()).forGetter(CaseDefinition::rarityWeights),
             CaseEntry.CODEC.listOf().fieldOf("entries").forGetter(CaseDefinition::entries)
-    ).apply(i, CaseDefinition::new)).validate(def -> def.entries.isEmpty()
-            ? com.mojang.serialization.DataResult.error(() -> "A case needs at least one entry")
-            : com.mojang.serialization.DataResult.success(def));
+    ).apply(i, CaseDefinition::new));
+
+    public static final Codec<CaseDefinition> CODEC = BASE_CODEC.validate(def ->
+            def.entries().isEmpty()
+                    ? DataResult.error(() -> "A case needs at least one entry")
+                    : DataResult.success(def));
 
     private final Optional<Component> name;
     private final Map<CaseRarity, Double> rarityWeights;
