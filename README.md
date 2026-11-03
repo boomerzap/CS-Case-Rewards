@@ -50,6 +50,27 @@ Weights are relative, they do not have to add up to 100.
 
 Use `/cscase info <case>` to see the resulting percentage for every entry.
 
+## Walkthrough: adding a new case
+
+1. Create `data/<namespace>/cscase/<name>.json`. In a datapack that is e.g.
+   `world/datapacks/mypack/data/mypack/cscase/treasure.json`; inside this mod's jar it is
+   `src/main/resources/data/cscase/cscase/<name>.json`.
+2. Fill in `entries`. Each one needs an `item` and should have a `rarity`; leave `weight` out unless you want
+   exact control. `src/main/resources/data/cscase/cscase/prospector.json` is a complete example showing a
+   `rarity_weights` override, enchanted/renamed items via `components`, and one explicit `weight`.
+3. Run `/reload` (or restart). A broken file is skipped and the reason is logged as `Failed to load case ...`.
+4. Check the odds with `/cscase info mypack:treasure`.
+5. Get one with `/cscase give @s mypack:treasure`. It also shows up in the **CS Cases** creative tab.
+
+Item `components` use the vanilla 1.21.1 format, for example a renamed, enchanted item:
+
+```json
+{"item": {"id": "minecraft:diamond_sword", "count": 1, "components": {
+  "minecraft:custom_name": {"text": "Blade", "italic": false, "color": "red"},
+  "minecraft:enchantments": {"levels": {"minecraft:sharpness": 5}}}},
+ "rarity": "covert"}
+```
+
 ## Handing cases out (quest rewards)
 
 The case item is `cscase:case` with the component `cscase:case_id`:
