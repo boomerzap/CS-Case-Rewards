@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
 /** Loads {@code data/<ns>/cscase/*.json} on every datapack reload. */
@@ -29,9 +30,12 @@ public class CaseLoader extends SimpleJsonResourceReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
         RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registries);
         Map<ResourceLocation, CaseDefinition> loaded = new HashMap<>();
-        files.forEach((id, json) -> CaseDefinition.CODEC.parse(ops, json)
-                .resultOrPartial(err -> CSCase.LOGGER.error("Failed to load case {}: {}", id, err))
-                .ifPresent(def -> loaded.put(id, def)));
+        files.forEach((id, json) -> {
+            DataResult<CaseDefinition> result = CaseDefinition.CODEC.parse(ops, json);
+            // Strict: a file with any error is skipped entirely rather than loaded with guessed values.
+            result.result().ifPresent(def -> loaded.put(id, def));
+            result.error().ifPresent(err -> CSCase.LOGGER.error("Failed to load case {}: {}", id, err.message()));
+        });
         CaseManager.replaceAll(loaded);
         CSCase.LOGGER.info("Loaded {} loot case(s)", loaded.size());
     }

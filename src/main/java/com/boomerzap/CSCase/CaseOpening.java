@@ -91,10 +91,14 @@ public final class CaseOpening {
     }
 
     private static void give(ServerPlayer player, Pending p) {
-        ItemStack stack = p.stack.copy();
-        player.getInventory().add(stack);
-        if (!stack.isEmpty()) {
-            player.drop(stack, false);
+        // Rewards can be larger than one stack (e.g. 128 andesite): hand over in max-size pieces.
+        ItemStack remaining = p.stack.copy();
+        while (!remaining.isEmpty()) {
+            ItemStack part = remaining.split(Math.min(remaining.getMaxStackSize(), remaining.getCount()));
+            player.getInventory().add(part);
+            if (!part.isEmpty()) {
+                player.drop(part, false);
+            }
         }
 
         if (Config.ANNOUNCE.get() && p.rarity.compareTo(Config.ANNOUNCE_MIN_RARITY.get()) >= 0) {

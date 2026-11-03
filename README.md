@@ -34,7 +34,7 @@ Put JSON files at `data/<namespace>/cscase/<name>.json`; the case id is `<namesp
 |-------|---------|
 | `name` | Optional text component. Defaults to the prettified file name. |
 | `rarity_weights` | Optional per-case override of the tier weights below. |
-| `entries[].item` | Item stack: `id`, optional `count`, optional `components` (enchantments, custom names, ...). |
+| `entries[].item` | Item stack: `id`, optional `count` (1 to 10000, may exceed one stack, e.g. 128; it is handed over as several stacks), optional `components` (enchantments, custom names, ...). |
 | `entries[].rarity` | `consumer`, `industrial`, `mil_spec` (default), `restricted`, `classified`, `covert`, `exceedingly_rare`. Sets the colour. |
 | `entries[].weight` | Optional absolute weight. |
 
