@@ -1,4 +1,4 @@
-# CS Case (`cscase`)
+# JordWG - Cases (`cscase`)
 
 Counter-Strike style loot cases for NeoForge 1.21.1. Cases and their contents/weights are defined in
 datapacks, opened through a CS-like GUI (rarity colours, scrolling roulette, reveal), and are designed to be
@@ -60,7 +60,7 @@ Use `/cscase info <case>` to see the resulting percentage for every entry.
    `rarity_weights` override, enchanted/renamed items via `components`, and one explicit `weight`.
 3. Run `/reload` (or restart). A broken file is skipped and the reason is logged as `Failed to load case ...`.
 4. Check the odds with `/cscase info mypack:treasure`.
-5. Get one with `/cscase give @s mypack:treasure`. It also shows up in the **CS Cases** creative tab.
+5. Get one with `/cscase give @s mypack:treasure`. It also shows up in the **JordWG - Cases** creative tab.
 
 Item `components` use the vanilla 1.21.1 format, for example a renamed, enchanted item:
 

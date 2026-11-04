@@ -1,5 +1,5 @@
 {
-  "itemGroup.cscase": "CS Cases",
+  "itemGroup.cscase": "JordWG - Cases",
   "item.cscase.case": "Weapon Case",
 
   "cscase.rarity.consumer": "Consumer Grade",
@@ -33,9 +33,9 @@
   "cscase.command.list.header": "%s case(s) loaded:",
   "cscase.command.info.header": "%s (%s items)",
 
-  "cscase.configuration.title": "CS Case Configs",
-  "cscase.configuration.section.cscase.server.toml": "CS Case Server Configs",
-  "cscase.configuration.section.cscase.server.toml.title": "CS Case Server Configs",
+  "cscase.configuration.title": "JordWG - Cases Configs",
+  "cscase.configuration.section.cscase.server.toml": "JordWG - Cases Server Configs",
+  "cscase.configuration.section.cscase.server.toml.title": "JordWG - Cases Server Configs",
   "cscase.configuration.openTicks": "Animation Length (ticks)",
   "cscase.configuration.announceDrops": "Announce Rare Drops",
   "cscase.configuration.announceMinRarity": "Minimum Announced Rarity"
