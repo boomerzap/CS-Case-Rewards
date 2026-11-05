@@ -16,11 +16,12 @@ case, **Open Another** appears.
 ## Defining cases
 
 Put JSON files at `data/<namespace>/cscase/<name>.json`; the case id is `<namespace>:<name>`.
-`/reload` picks changes up, and clients are synced automatically. See `data/cscase/cscase/example.json`.
+`/reload` picks changes up, and clients are synced automatically. The mod ships with no cases of its own;
+the sample below is a complete case you can copy.
 
 ```json
 {
-  "name": {"text": "Fracture Case", "color": "gold"},
+  "name": {"text": "Fracture Case", "color": "rainbow"},
   "rarity_weights": {"mil_spec": 70, "covert": 1},
   "entries": [
     {"item": {"id": "minecraft:iron_ingot", "count": 6}, "rarity": "mil_spec"},
@@ -32,11 +33,24 @@ Put JSON files at `data/<namespace>/cscase/<name>.json`; the case id is `<namesp
 
 | Field | Meaning |
 |-------|---------|
-| `name` | Optional text component. Defaults to the prettified file name. |
+| `name` | Optional text component. Defaults to the prettified file name. Supports `"color": "rainbow"` (see below). |
 | `rarity_weights` | Optional per-case override of the tier weights below. |
 | `entries[].item` | Item stack: `id`, optional `count` (1 to 10000, may exceed one stack, e.g. 128; it is handed over as several stacks), optional `components` (enchantments, custom names, ...). |
 | `entries[].rarity` | `consumer`, `industrial`, `mil_spec` (default), `restricted`, `classified`, `covert`, `exceedingly_rare`. Sets the colour. |
 | `entries[].weight` | Optional absolute weight. |
+
+### Rainbow names
+
+Use `"color": "rainbow"` in a case's `name` for a rainbow gradient. It works everywhere the name appears
+(item name, tooltips, chat, commands) and the letters also shimmer on the case screen.
+
+```json
+"name": {"text": "Fracture Case", "color": "rainbow", "bold": true}
+"name": {"text": "", "extra": [{"text": "Mystery ", "color": "gray"}, {"text": "Rainbow", "color": "rainbow"}]}
+```
+
+Rainbow colours that object's own `text`; entries in its `extra` list keep their own colours. It only applies to
+literal `text` (not `translate`). Other style keys such as `bold` and `italic` work as normal.
 
 ### How weights work
 
@@ -56,8 +70,8 @@ Use `/cscase info <case>` to see the resulting percentage for every entry.
    `world/datapacks/mypack/data/mypack/cscase/treasure.json`; inside this mod's jar it is
    `src/main/resources/data/cscase/cscase/<name>.json`.
 2. Fill in `entries`. Each one needs an `item` and should have a `rarity`; leave `weight` out unless you want
-   exact control. `src/main/resources/data/cscase/cscase/prospector.json` is a complete example showing a
-   `rarity_weights` override, enchanted/renamed items via `components`, and one explicit `weight`.
+   exact control. Use the sample above as a starting point; `rarity_weights`, `components` and an explicit
+   `weight` are all optional.
 3. Run `/reload` (or restart). A broken file is skipped and the reason is logged as `Failed to load case ...`.
 4. Check the odds with `/cscase info mypack:treasure`.
 5. Get one with `/cscase give @s mypack:treasure`. It also shows up in the **JordWG - Cases** creative tab.
@@ -76,7 +90,7 @@ Item `components` use the vanilla 1.21.1 format, for example a renamed, enchante
 The case item is `cscase:case` with the component `cscase:case_id`:
 
 ```
-/give @s cscase:case[cscase:case_id="cscase:example"]
+/give @s cscase:case[cscase:case_id="mypack:treasure"]
 ```
 
 Commands (permission level 2, so quest mods that run commands as the server can use them):
@@ -89,8 +103,8 @@ Commands (permission level 2, so quest mods that run commands as the server can 
 | `/cscase list` | List loaded cases. |
 | `/cscase info <case>` | Show contents and chances. |
 
-Typical quest setups: reward command `cscase give @p cscase:example`, or a vanilla loot table entry using
-`minecraft:set_components` with `{"cscase:case_id": "cscase:example"}`.
+Typical quest setups: reward command `cscase give @p mypack:treasure`, or a vanilla loot table entry using
+`minecraft:set_components` with `{"cscase:case_id": "mypack:treasure"}`.
 
 ## Config (`serverconfig/cscase-server.toml`)
 

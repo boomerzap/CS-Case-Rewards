@@ -14,6 +14,7 @@ import com.boomerzap.CSCase.CaseRarity;
 import com.boomerzap.CSCase.item.CaseItem;
 import com.boomerzap.CSCase.network.OpenCasePayload;
 
+import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -338,7 +339,10 @@ public class CaseScreen extends Screen {
             g.fill(x0, panelY, x1, panelY + 2, all[n].argb());
         }
 
-        g.drawCenteredString(font, title, panelX + panelW / 2, panelY + 11, 0xFFFFFFFF);
+        Component shownTitle = def != null
+                ? def.animatedDisplayName(caseId, (Util.getMillis() % 3000L) / 3000f)
+                : title;
+        g.drawCenteredString(font, shownTitle, panelX + panelW / 2, panelY + 11, 0xFFFFFFFF);
     }
 
     // -- preview

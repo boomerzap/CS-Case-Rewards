@@ -10,7 +10,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
@@ -24,7 +23,7 @@ import net.minecraft.util.RandomSource;
  */
 public final class CaseDefinition {
     private static final Codec<CaseDefinition> BASE_CODEC = RecordCodecBuilder.create(i -> i.group(
-            ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(CaseDefinition::name),
+            CaseName.CODEC.optionalFieldOf("name").forGetter(CaseDefinition::name),
             Codec.unboundedMap(CaseRarity.CODEC, Codec.doubleRange(0.0, 1.0E9))
                     .optionalFieldOf("rarity_weights", Map.of()).forGetter(CaseDefinition::rarityWeights),
             CaseEntry.CODEC.listOf().fieldOf("entries").forGetter(CaseDefinition::entries)
@@ -35,13 +34,13 @@ public final class CaseDefinition {
                     ? DataResult.error(() -> "A case needs at least one entry")
                     : DataResult.success(def));
 
-    private final Optional<Component> name;
+    private final Optional<CaseName> name;
     private final Map<CaseRarity, Double> rarityWeights;
     private final List<CaseEntry> entries;
     private final double[] weights;
     private final double totalWeight;
 
-    public CaseDefinition(Optional<Component> name, Map<CaseRarity, Double> rarityWeights, List<CaseEntry> entries) {
+    public CaseDefinition(Optional<CaseName> name, Map<CaseRarity, Double> rarityWeights, List<CaseEntry> entries) {
         this.name = name;
         this.rarityWeights = Map.copyOf(rarityWeights);
         this.entries = List.copyOf(entries);
@@ -67,7 +66,7 @@ public final class CaseDefinition {
         this.totalWeight = total;
     }
 
-    public Optional<Component> name() {
+    public Optional<CaseName> name() {
         return name;
     }
 
@@ -103,9 +102,17 @@ public final class CaseDefinition {
         return entries.get(rollIndex(random));
     }
 
-    /** Display name: explicit {@code name} or a prettified resource path ("my_case" becomes "My Case"). */
+    /**
+     * Display name: explicit {@code name} (rainbow baked in) or a prettified resource path
+     * ("my_case" becomes "My Case").
+     */
     public Component displayName(ResourceLocation id) {
-        return name.orElseGet(() -> Component.literal(prettify(id.getPath())));
+        return name.map(CaseName::component).orElseGet(() -> Component.literal(prettify(id.getPath())));
+    }
+
+    /** Like {@link #displayName} but with any rainbow letters shifted by {@code phase}, for animated UIs. */
+    public Component animatedDisplayName(ResourceLocation id, float phase) {
+        return name.map(n -> n.animated(phase)).orElseGet(() -> displayName(id));
     }
 
     public static String prettify(String path) {
