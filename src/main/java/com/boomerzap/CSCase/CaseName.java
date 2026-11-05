@@ -76,7 +76,7 @@ public final class CaseName {
         @Override
         public <T> DataResult<Pair<CaseName, T>> decode(DynamicOps<T> ops, T input) {
             JsonElement json = ops.convertTo(JsonOps.INSTANCE, input);
-            return parse(json).map(name -> Pair.of(name, ops.empty()));
+            return CaseName.fromJson(json).map(name -> Pair.of(name, ops.empty()));
         }
 
         @Override
@@ -86,7 +86,7 @@ public final class CaseName {
         }
     };
 
-    public static DataResult<CaseName> parse(JsonElement json) {
+    public static DataResult<CaseName> fromJson(JsonElement json) {
         State state = new State();
         JsonElement expanded = expand(json, state);
         return ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, expanded)
